@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucsmy.eaccount.manage.dao.WorkOrderDao">
+    <sql id="query">
+
+                SELECT
+                       a.consumer as 'consumer',
+                       a.state as 'state',
+                       a.worker as 'worker',
+                       a.status as 'status',
+                       a.title as 'title',
+                       a.content as 'content',
+                       a.product as 'product',
+                       a.updateTime as 'updateTime',
+                       a.createTime as 'createTime',
+                       a.aid as 'aid'
+                FROM biz_work_order a
+
+    </sql>
+
+    <insert id="save" parameterType="com.ucsmy.eaccount.manage.entity.WorkOrder">
+
+                insert into biz_work_order(consumer, worker, title, content,product)
+                values (#{consumer},
+                        #{worker},
+                        #{title},
+                        #{content},
+                        #{product,jdbcType=VARCHAR}
+                )
+
+    </insert>
+
+    <update id="update" parameterType="com.ucsmy.eaccount.manage.entity.WorkOrder">
+
+                update biz_work_order
+                set consumer   = #{consumer},
+                    state      = #{state},
+                    worker     = #{worker},
+                    status     = #{status},
+                    updateTime = #{updateTime},
+                    createTime = #{createTime},
+                    aid        = #{aid}
+                where id = #{id}
+
+    </update>
+    <update id="distributeWorker">
+
+                UPDATE biz_work_order SET worker = #{worker},`state` = 1 WHERE aid = #{aid}
+
+    </update>
+
+    <update id="finishOrder">
+
+                UPDATE biz_work_order SET `state` = 2 WHERE aid = #{aid}
+
+    </update>
+
+    <delete id="delete" parameterType="String">
+
+                delete
+                from biz_work_order
+                where id = #{id}
+
+    </delete>
+
+    <select id="findById" parameterType="string" resultType="com.ucsmy.eaccount.manage.entity.WorkOrder">
+        <include refid="query"/>
+        where a.id = #{id}
+    </select>
+
+    <select id="find" parameterType="string" resultType="com.ucsmy.eaccount.manage.entity.WorkOrder">
+        <include refid="query"/>
+        <where>
+            <if test="entity != null">
+            </if>
+        </where>
+        ORDER BY a.createTime DESC
+    </select>
+
+    <select id="getOrderList" resultType="com.ucsmy.eaccount.manage.entity.WorkOrder">
+        <include refid="query"/>
+        <where>
+            <choose>
+                <when test="level == 0">
+                    a.`state` != 2
+                </when>
+                <when test="level == 1">
+                    a.worker = #{username}
+                </when>
+                <when test="level == 2">
+                    a.consumer = #{username}
+                </when>
+                <otherwise>
+                    你查你妈卖批你角色都没得
+                </otherwise>
+            </choose>
+        </where>
+        ORDER BY a.createTime DESC
+        LIMIT #{offset},#{size}
+    </select>
+
+    <select id="getOrderCount" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM biz_work_order a
+        <where>
+            <choose>
+                <when test="level == 0">
+                    a.`state` != 2
+                </when>
+                <when test="level == 1">
+                    a.worker = #{username}
+                </when>
+                <when test="level == 2">
+                    a.consumer = #{username}
+                </when>
+                <otherwise>
+                    你查你妈卖批你角色都没得
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <update id="updateWorkOrder">
+
+                UPDATE biz_work_order
+                SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}, product = #{product,jdbcType=VARCHAR}
+                WHERE aid = #{aid,jdbcType=BIGINT}
+
+    </update>
+
+    <delete id="deleteByWorkOrderId">
+        DELETE FROM biz_work_order  WHERE aid = #{id};
+    </delete>
+</mapper>

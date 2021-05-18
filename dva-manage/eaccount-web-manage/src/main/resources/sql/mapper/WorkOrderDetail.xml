@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucsmy.eaccount.manage.dao.WorkOrderDetailDao">
+
+    <sql id="query">
+        SELECT a.operator    as 'operator',
+               a.order_id    as 'orderId',
+               a.status      as 'status',
+               a.aid         as 'aid',
+               a.deal_answer as 'dealAnswer',
+               a.createTime  as 'createTime',
+               a.deal_type   as 'dealType'
+        FROM biz_work_order_detail a
+    </sql>
+
+    <insert id="save" parameterType="com.ucsmy.eaccount.manage.entity.WorkOrderDetail">
+        insert into biz_work_order_detail(operator,
+                                          order_id,
+                                          status,
+                                          aid,
+                                          deal_answer,
+                                          createTime,
+                                          deal_type)
+        values (#{operator},
+                #{orderId},
+                #{status},
+                #{aid},
+                #{dealAnswer},
+                #{createTime},
+                #{dealType})
+    </insert>
+
+    <update id="update" parameterType="com.ucsmy.eaccount.manage.entity.WorkOrderDetail">
+        update biz_work_order_detail
+        set operator    = #{operator},
+            order_id    = #{orderId},
+            status      = #{status},
+            aid         = #{aid},
+            deal_answer = #{dealAnswer},
+            createTime  = #{createTime},
+            deal_type   = #{dealType}
+        where id = #{id}
+    </update>
+
+    <insert id="updateOrderProcess">
+        INSERT INTO biz_work_order_detail(order_id, deal_type, deal_answer, operator)
+        VALUES (#{orderId,jdbcType=BIGINT},
+                #{dealType,jdbcType=INTEGER},
+                #{dealAnswer,jdbcType=VARCHAR},
+                #{operator,jdbcType=VARCHAR});
+    </insert>
+
+    <delete id="delete" parameterType="String">
+        delete
+        from biz_work_order_detail
+        where id = #{id}
+    </delete>
+
+    <select id="findById" parameterType="string" resultType="com.ucsmy.eaccount.manage.entity.WorkOrderDetail">
+        <include refid="query"/>
+        where a.id = #{id}
+    </select>
+
+    <select id="find" parameterType="string" resultType="com.ucsmy.eaccount.manage.entity.WorkOrderDetail">
+        <include refid="query"/>
+        <where>
+            <if test="entity != null">
+            </if>
+        </where>
+    </select>
+
+    <resultMap id="workOrderWithDetails" type="com.ucsmy.eaccount.manage.entity.WorkOrderWithDetails">
+        <id column="aid" jdbcType="BIGINT" property="aid"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="content" jdbcType="LONGVARCHAR" property="content"/>
+        <result column="consumer" jdbcType="VARCHAR" property="consumer"/>
+        <result column="worker" jdbcType="VARCHAR" property="worker"/>
+        <result column="createTime" jdbcType="TIMESTAMP" property="createTime"/>
+        <collection property="details" ofType="com.ucsmy.eaccount.manage.entity.WorkOrderDetail">
+            <id column="detailId" jdbcType="BIGINT" property="aid"/>
+            <result column="operator" jdbcType="VARCHAR" property="operator"/>
+            <result column="answer" jdbcType="VARCHAR" property="dealAnswer"/>
+            <result column="dealType" jdbcType="INTEGER" property="dealType"/>
+            <result column="operateTime" jdbcType="TIMESTAMP" property="createTime"/>
+        </collection>
+    </resultMap>
+
+    <select id="getDetails" resultMap="workOrderWithDetails">
+        SELECT wkod.aid          as aid,
+               wkod.title        as title,
+               wkod.content      as content,
+               wkod.consumer     as consumer,
+               wkod.worker       as worker,
+               wkod.createTime   as createTime,
+               wkodd.aid         as detailId,
+               wkodd.operator    as operator,
+               wkodd.deal_answer as answer,
+               wkodd.deal_type   as dealType,
+               wkodd.createTime  as operateTime
+        FROM biz_work_order wkod
+                 LEFT JOIN biz_work_order_detail wkodd ON wkod.aid = wkodd.order_id AND wkodd.`status` = 'A'
+        WHERE wkod.aid = #{aid,jdbcType=BIGINT}
+    </select>
+</mapper>

@@ -1,0 +1,42 @@
+.baseContent {
+    margin-bottom: 30px;
+    border-bottom: 1px solid darkolivegreen;
+}
+
+.orderTitle {
+    margin-bottom: 30px;
+}
+
+.orderContent {
+    padding-bottom: 10px;
+}
+
+.code-box-meta.markdown {
+    position: relative;
+    padding: 17px 16px 15px 20px;
+    border-radius: 0 0 4px 4px;
+    -webkit-transition: background-color .4s;
+    transition: background-color .4s;
+    width: 100%;
+    font-size: 16px;
+    border: 1px dotted slategrey;
+}
+
+.markdown {
+    color: rgba(0, 0, 0, .65);
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.code-box-title {
+    position: absolute;
+    top: -14px;
+    padding: 1px 8px;
+    margin-left: -8px;
+    color: #777;
+    border-radius: 4px 4px 0 0;
+    background: #fff;
+    -webkit-transition: background-color .4s;
+    transition: background-color .4s;
+}
+

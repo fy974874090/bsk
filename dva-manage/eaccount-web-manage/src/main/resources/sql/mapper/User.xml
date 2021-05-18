@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucsmy.eaccount.manage.dao.UserDao">
+
+    <insert id="register">
+        INSERT INTO manage_user_account(`id`, `account`, `password`, `salt`, `role_id`)
+            VALUE (#{userId}, #{username}, #{password}, #{slat,jdbcType=VARCHAR},
+                   (SELECT id from manage_role where level = 2 LIMIT 1));
+        INSERT INTO manage_user_profile(id) VALUES(#{userId,jdbcType=VARCHAR});
+    </insert>
+
+    <select id="getUserId" resultType="java.lang.String">
+        SELECT id from manage_user_account WEHRE account = #{username,jdbcType=VARCHAR};
+    </select>
+</mapper>
